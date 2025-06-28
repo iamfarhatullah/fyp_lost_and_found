@@ -1,75 +1,55 @@
-<section class="section dashboard">
-  <div class="row">
+<section class="section py-4">
+  <div class="container">
+    <div class="row g-4">
 
-    <!-- Left side columns -->
-    <div class="col-lg-12 col-md-12 col-sm-12 col-12">
-      <div class="row">
-
-        <div class="col-xxl-6 col-xl-6 col-lg-4 col-md-4 col-sm-12 col-12">
-          <div class="card info-card">
-            <div class="card-body">
-              <h5 class="card-title">Categories <span>| Active</span></h5>
-
-              <div class="d-flex align-items-center justify-content-between">
-                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-success bg-opacity-25 text-success">
-                  <i class="bi bi-menu-button-wide"></i>
-                </div>
-                <div class="ps-3">
-                  <?php
-                  $categories = $conn->query("SELECT * FROM `category_list` where `status` = 1")->num_rows;
-                  ?>
-                  <h6><?= format_num($categories) ?></h6>
-                  <!-- <span class="text-success small pt-1 fw-bold">12%</span> <span class="text-muted small pt-2 ps-1">increase</span> -->
-
-                </div>
-              </div>
+      <!-- Active Categories -->
+      <div class="col-lg-4 col-md-6 col-sm-12">
+        <div class="card border-0 shadow-sm">
+          <div class="card-body pt-4 d-flex align-items-center gap-3">
+            <div class="bg-success bg-opacity-10 text-success rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+              <i class="bi bi-menu-button-wide fs-4"></i>
             </div>
-
+            <div>
+              <h6 class="mb-1">Active Categories</h6>
+              <?php $categories = $conn->query("SELECT * FROM `category_list` WHERE `status` = 1")->num_rows; ?>
+              <h4 class="mb-0"><?= format_num($categories) ?></h4>
+            </div>
           </div>
         </div>
-        <div class="col-xxl-6 col-xl-6 col-lg-4 col-md-4 col-sm-12 col-12">
-          <div class="card info-card">
-            <div class="card-body">
-              <h5 class="card-title">Item Entry <span>| Pending</span></h5>
-              <div class="d-flex align-items-center justify-content-between">
-                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-dark bg-opacity-25 text-dark">
-                  <i class="bi bi-question-octagon"></i>
-                </div>
-                <div class="ps-3">
-                  <?php
-                  $Items = $conn->query("SELECT * FROM `item_list` where `status` = 0")->num_rows;
-                  ?>
-                  <h6><?= format_num($Items) ?></h6>
-                  <!-- <span class="text-success small pt-1 fw-bold">12%</span> <span class="text-muted small pt-2 ps-1">increase</span> -->
+      </div>
 
-                </div>
-              </div>
+      <!-- Pending Items -->
+      <div class="col-lg-4 col-md-6 col-sm-12">
+        <div class="card border-0 shadow-sm">
+          <div class="card-body pt-4 d-flex align-items-center gap-3">
+            <div class="bg-warning bg-opacity-10 text-warning rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+              <i class="bi bi-hourglass-split fs-4"></i>
             </div>
-
+            <div>
+              <h6 class="mb-1">Pending Items</h6>
+              <?php $items_pending = $conn->query("SELECT * FROM `item_list` WHERE `status` = 0")->num_rows; ?>
+              <h4 class="mb-0"><?= format_num($items_pending) ?></h4>
+            </div>
           </div>
         </div>
-        <div class="col-xxl-6 col-xl-6 col-lg-4 col-md-4 col-sm-12 col-12">
-          <div class="card info-card">
-            <div class="card-body">
-              <h5 class="card-title">Item Entry <span>| Published</span></h5>
-              <div class="d-flex align-items-center justify-content-between">
-                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-primary bg-opacity-25 text-primary">
-                  <i class="bi bi-question-octagon"></i>
-                </div>
-                <div class="ps-3">
-                  <?php
-                  $items = $conn->query("SELECT * FROM `item_list` where `status` = 1")->num_rows;
-                  ?>
-                  <h6><?= format_num($items) ?></h6>
-                  <!-- <span class="text-success small pt-1 fw-bold">12%</span> <span class="text-muted small pt-2 ps-1">increase</span> -->
+      </div>
 
-                </div>
-              </div>
+      <!-- Published Items -->
+      <div class="col-lg-4 col-md-6 col-sm-12">
+        <div class="card border-0 shadow-sm">
+          <div class="card-body pt-4 d-flex align-items-center gap-3">
+            <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+              <i class="bi bi-check-circle fs-4"></i>
             </div>
-
+            <div>
+              <h6 class="mb-1">Published Items</h6>
+              <?php $items_published = $conn->query("SELECT * FROM `item_list` WHERE `status` = 1")->num_rows; ?>
+              <h4 class="mb-0"><?= format_num($items_published) ?></h4>
+            </div>
           </div>
         </div>
-      </div><!-- End Left side columns -->
+      </div>
 
     </div>
+  </div>
 </section>

@@ -1,118 +1,128 @@
 <?php if ($_settings->chk_flashdata('success')): ?>
 	<script>
-		alert_toast("<?php echo $_settings->flashdata('success') ?>", 'success')
+		alert_toast("<?= $_settings->flashdata('success') ?>", 'success');
 	</script>
 <?php endif; ?>
+
 <style>
-	#list td:nth-child(4) {
-		text-align: end !important;
+	table#categoryTable td:nth-child(4) {
+		text-align: right !important;
 	}
 
-	#list td:nth-child(5),
-	#list td:nth-child(6) {
+	table#categoryTable td:nth-child(5),
+	table#categoryTable td:nth-child(6) {
 		text-align: center !important;
 	}
 </style>
-<div class="card card-outline rounded-0 card-navy">
-	<div class="card-header ">
-		<div class="card-tools d-flex justify-content-end">
-			<a href="<?= base_url ?>admin?page=categories/manage_category" id="create_new" class="btn btn-flat btn-primary bg-gradient-teal border-0 rounded00"><span class="fas fa-plus"></span> Create New</a>
-		</div>
-	</div>
-	<div class="card-body">
-		<div class="container-fluid">
-			<div class="table-responsive">
-				<table class="table table-sm table-hover table-striped table-bordered" id="list">
-					<colgroup>
-						<col width="5%">
-						<col width="20%">
-						<col width="25%">
-						<col width="25%">
-						<col width="15">
-						<col width="10%">
-					</colgroup>
-					<thead>
-						<tr>
-							<th>#</th>
-							<th>Date Created</th>
-							<th>Name</th>
-							<th>Description</th>
-							<th>Status</th>
-							<th>Action</th>
-						</tr>
-					</thead>
-					<tbody>
-						<?php
-						$i = 1;
-						$qry = $conn->query("SELECT * from `category_list` order by `name` asc ");
-						while ($row = $qry->fetch_assoc()):
-						?>
-							<tr>
-								<td class="align-items-center text-center"><?php echo $i++; ?></td>
-								<td class="align-items-center"><?php echo date("Y-m-d g:i A", strtotime($row['created_at'])) ?></td>
-								<td class="align-items-center"><?= $row['name'] ?></td>
-								<td class="align-items-center text-end">
-									<p class="truncate-1" style="max-width:150px"><?= strip_tags(htmlspecialchars_decode($row['description'])) ?></p>
-								</td>
-								<td class="align-items-center justify-content-center text-center">
-									<?php if ($row['status'] == 1): ?>
-										<span class="badge bg-success px-3 rounded-pill">Active</span>
-									<?php else: ?>
-										<span class="badge bg-danger px-3 rounded-pill">Inactive</span>
-									<?php endif; ?>
-								</td>
-								<td class="align-items-center" align="center">
-									<div class="dropdown">
-										<button type="button" class="btn btn-flat p-1 btn-default btn-sm border dropdown-toggle dropdown-icon" data-bs-toggle="dropdown">
-											Action
-										</button>
-										<div class="dropdown-menu" role="menu">
-											<a class="dropdown-item" href="./?page=categories/view_category&id=<?php echo $row['id'] ?>"><span class="bi bi-card-text text-dark"></span> View</a>
-											<div class="dropdown-divider"></div>
-											<a class="dropdown-item" href="./?page=categories/manage_category&id=<?php echo $row['id'] ?>"><span class="bi bi-pencil-square text-primary"></span> Edit</a>
-											<div class="dropdown-divider"></div>
-											<a class="dropdown-item delete_data" href="javascript:void(0)" data-id="<?php echo $row['id'] ?>"><span class="bi bi-trash text-danger"></span> Delete</a>
-										</div>
-									</div>
-								</td>
-							</tr>
-						<?php endwhile; ?>
-					</tbody>
-				</table>
-			</div>
-		</div>
-	</div>
-</div>
-<script>
-	$(document).ready(function() {
-		$('.delete_data').click(function() {
-			_conf("Are you sure to delete this category permanently?", "delete_category", [$(this).attr('data-id')])
-		})
-		const dT = new simpleDatatables.DataTable('#list')
-	})
 
-	function delete_category($id) {
+<section class="card card-outline card-navy rounded-0 shadow-sm">
+	<header class="card-header d-flex justify-content-between align-items-center">
+		<h3 class="card-title mb-0">Category List</h3>
+		<a href="<?= base_url ?>admin?page=categories/manage_category" class="btn btn-sm btn-success rounded-pill">
+			<i class="fas fa-plus me-1"></i> New Category
+		</a>
+	</header>
+
+	<div class="card-body">
+		<div class="table-responsive">
+			<table class="table table-hover table-striped table-sm" id="categoryTable">
+				<colgroup>
+					<col width="5%">
+					<col width="22%">
+					<col width="30%">
+					<col width="10%">
+					<col width="18%">
+					<col width="15%">
+				</colgroup>
+				<thead class="table-dark text-center">
+					<tr>
+						<th>#</th>
+						<th>Name</th>
+						<th>Description</th>
+						<th>Status</th>
+						<th>Created At</th>
+						<th>Options</th>
+					</tr>
+				</thead>
+				<tbody>
+					<?php
+					$count = 1;
+					$categories = $conn->query("SELECT * FROM `category_list` ORDER BY `name` ASC");
+					while ($cat = $categories->fetch_assoc()):
+					?>
+						<tr>
+							<td class="text-center"><?= $count++ ?></td>
+
+							<td><?= htmlspecialchars($cat['name']) ?></td>
+							<td class="text-end">
+								<p class="text-truncate" style="max-width: 200px;">
+									<?= strip_tags(htmlspecialchars_decode($cat['description'])) ?>
+								</p>
+							</td>
+							<td>
+								<span class="badge rounded-pill px-3 <?= $cat['status'] == 1 ? 'bg-success' : 'bg-danger' ?>">
+									<?= $cat['status'] == 1 ? 'Active' : 'Inactive' ?>
+								</span>
+							</td>
+							<td><?= date("Y-m-d h:i A", strtotime($cat['created_at'])) ?></td>
+							<td>
+								<div class="dropdown text-center">
+									<button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+										Actions
+									</button>
+									<div class="dropdown-menu">
+										<a class="dropdown-item" href="./?page=categories/view_category&id=<?= $cat['id'] ?>">
+											<i class="bi bi-eye text-info"></i> View
+										</a>
+										<a class="dropdown-item" href="./?page=categories/manage_category&id=<?= $cat['id'] ?>">
+											<i class="bi bi-pencil text-primary"></i> Edit
+										</a>
+										<a class="dropdown-item text-danger delete-category" href="javascript:void(0)" data-id="<?= $cat['id'] ?>">
+											<i class="bi bi-trash"></i> Delete
+										</a>
+									</div>
+								</div>
+							</td>
+						</tr>
+					<?php endwhile; ?>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</section>
+
+<script>
+	$(function() {
+		const table = new simpleDatatables.DataTable('#categoryTable');
+
+		$('.delete-category').on('click', function() {
+			const categoryId = $(this).data('id');
+			_conf("Do you really want to delete this category?", "deleteCategory", [categoryId]);
+		});
+	});
+
+	function deleteCategory(id) {
 		start_loader();
 		$.ajax({
 			url: _base_url_ + "classes/Master.php?f=delete_category",
 			method: "POST",
 			data: {
-				id: $id
+				id
 			},
 			dataType: "json",
-			error: err => {
-				console.log(err)
-				alert_toast("An error occured.", 'error');
-				end_loader();
-			},
-			success: function(resp) {
-				if (typeof resp == 'object' && resp.status == 'success') {
+			success: function(response) {
+				if (response?.status === 'success') {
 					location.reload();
 				} else {
-					alert_toast("An error occured.", 'error');
+					alert_toast("Failed to delete category.", 'error');
 					end_loader();
 				}
+			},
+			error: function(err) {
+				console.error(err);
+				alert_toast("An error occurred.", 'error');
+				end_loader();
 			}
-		})
+		});
 	}
 </script>

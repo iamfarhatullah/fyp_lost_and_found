@@ -1,96 +1,92 @@
 <?php
-if (isset($_GET['id']) && $_GET['id'] > 0) {
-	$qry = $conn->query("SELECT * from `category_list` where id = '{$_GET['id']}' ");
+if (!empty($_GET['id'])) {
+	$qry = $conn->query("SELECT * FROM `category_list` WHERE id = '{$_GET['id']}' ");
 	if ($qry->num_rows > 0) {
-		foreach ($qry->fetch_assoc() as $k => $v) {
-			$$k = $v;
+		foreach ($qry->fetch_assoc() as $key => $val) {
+			$$key = $val;
 		}
 	}
 }
 ?>
-<div class="row mt-lg-n4 mt-md-n4 justify-content-center">
-	<div class="col-lg-8 col-md-10 col-sm-12 col-xs-12">
-		<div class="card rounded-0">
-			<div class="card-header py-0">
-				<div class="card-title py-1"><b><?= isset($id) ? "Update Category Details" : "New Category Entry" ?></b></div>
+<section class="row justify-content-center mt-n3">
+	<div class="col-lg-12 col-md-10 col-sm-12">
+		<div class="card border shadow-sm">
+			<div class="card-header bg-light py-2">
+				<h5 class="mb-0"><?= isset($id) ? "Edit Category" : "Add New Category" ?></h5>
 			</div>
 			<div class="card-body">
-				<div class="container-fluid mt-3">
-					<form action="" id="category-form">
-						<input type="hidden" name="id" value="<?php echo isset($id) ? $id : '' ?>">
-						<div class="row">
-							<div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
-								<label for="name" class="control-label">Category Name</label>
-								<input type="text" name="name" id="name" class="form-control form-control-sm rounded-0" value="<?php echo isset($name) ? $name : ''; ?>" autofocus required />
-							</div>
-						</div>
-						<div class="row">
-							<div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
-								<label for="description" class="control-label">Description</label>
-								<textarea rows="3" name="description" id="description" class="form-control form-control-sm rounded-0 tinymce-editor" required><?php echo isset($description) ? $description : ''; ?></textarea>
-							</div>
-						</div>
-						<div class="row">
-							<div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
-								<label for="status" class="control-label">Status</label>
-								<select name="status" id="status" class="form-select form-select-sm rounded-0" required="required">
-									<option value="1" <?= isset($status) && $status == 1 ? 'selected' : '' ?>>Active</option>
-									<option value="0" <?= isset($status) && $status == 0 ? 'selected' : '' ?>>Inactive</option>
-								</select>
-							</div>
-						</div>
-					</form>
-				</div>
+				<form id="categoryForm">
+					<input type="hidden" name="id" value="<?= $id ?? '' ?>">
+
+					<div class="mb-3">
+						<label for="name" class="form-label">Category Name</label>
+						<input type="text" name="name" id="name" class="form-control form-control-sm" value="<?= $name ?? '' ?>" required>
+					</div>
+					<div class="mb-3">
+						<label for="status" class="form-label">Status</label>
+						<select name="status" id="status" class="form-select form-select-sm" required>
+							<option value="1" <?= (isset($status) && $status == 1) ? 'selected' : '' ?>>Active</option>
+							<option value="0" <?= (isset($status) && $status == 0) ? 'selected' : '' ?>>Inactive</option>
+						</select>
+					</div>
+					<div class="mb-3">
+						<label for="description" class="form-label">Description</label>
+						<textarea name="description" id="description" rows="2" class="form-control form-control-sm tinymce-editor" required><?= $description ?? '' ?></textarea>
+					</div>
+
+
+				</form>
 			</div>
-			<div class="card-footer py-1 text-center">
-				<button class="btn btn-primary btn-sm bg-gradient-teal btn-flat border-0" form="category-form"><i class="fa fa-save"></i> Save</button>
-				<a class="btn btn-light btn-sm bg-gradient-light border btn-flat" href="./?page=categories"><i class="fa fa-times"></i> Cancel</a>
+			<div class="card-footer text-center py-2">
+				<button type="submit" form="categoryForm" class="btn btn-success btn-sm px-4">
+					<i class="fa fa-save me-1"></i> Save
+				</button>
+				<a href="./?page=categories" class="btn btn-secondary btn-sm px-4">
+					<i class="fa fa-times me-1"></i> Cancel
+				</a>
 			</div>
 		</div>
 	</div>
-</div>
+</section>
+
 <script>
-	$(document).ready(function() {
-		$('#category-form').submit(function(e) {
+	$(function() {
+		$('#categoryForm').on('submit', function(e) {
 			e.preventDefault();
-			var _this = $(this)
+			const form = $(this);
 			$('.err-msg').remove();
-			setTimeout(() => {
-				start_loader();
-				$.ajax({
-					url: _base_url_ + "classes/Master.php?f=save_category",
-					data: new FormData($(this)[0]),
-					cache: false,
-					contentType: false,
-					processData: false,
-					method: 'POST',
-					type: 'POST',
-					dataType: 'json',
-					error: err => {
-						console.log(err)
-						alert_toast("An error occured", 'error');
-						end_loader();
-					},
-					success: function(resp) {
-						if (typeof resp == 'object' && resp.status == 'success') {
-							location.replace('./?page=categories/view_category&id=' + resp.sid)
-						} else if (resp.status == 'failed' && !!resp.msg) {
-							var el = $('<div>')
-							el.addClass("alert alert-danger err-msg").text(resp.msg)
-							_this.prepend(el)
-							el.show('slow')
-							$("html, body").scrollTop(0);
-							end_loader()
-						} else {
-							alert_toast("An error occured", 'error');
-							end_loader();
-							console.log(resp)
-						}
+
+			start_loader();
+
+			$.ajax({
+				url: _base_url_ + "classes/Master.php?f=save_category",
+				method: "POST",
+				data: new FormData(this),
+				cache: false,
+				contentType: false,
+				processData: false,
+				dataType: "json",
+				error: function(err) {
+					console.error(err);
+					alert_toast("An unexpected error occurred.", 'error');
+					end_loader();
+				},
+				success: function(resp) {
+					if (resp?.status === 'success') {
+						location.href = `./?page=categories/view_category&id=${resp.sid}`;
+					} else if (resp?.status === 'failed' && resp.msg) {
+						const errorEl = $('<div class="alert alert-danger err-msg"></div>').text(resp.msg);
+						form.prepend(errorEl);
+						$('html, body').animate({
+							scrollTop: 0
+						}, 'fast');
+					} else {
+						alert_toast("Operation failed.", 'error');
+						console.log(resp);
 					}
-				})
-			}, 200);
-
-		})
-
-	})
+					end_loader();
+				}
+			});
+		});
+	});
 </script>

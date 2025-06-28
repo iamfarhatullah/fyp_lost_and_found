@@ -1,91 +1,107 @@
 <style>
-	#list td:nth-child(4),
-	#list td:nth-child(5) {
+	#inquiryTable td:nth-child(4),
+	#inquiryTable td:nth-child(5) {
 		text-align: center !important;
 	}
 </style>
-<div class="card card-outline rounded-0 card-navy">
-	<div class="card-body pt-4">
-		<div class="container-fluid">
-			<div class="table-responsive">
-				<table class="table table-sm table-hover table-striped table-bordered" id="list">
-					<thead>
+
+<div class="card border-0 shadow-sm rounded-0">
+	<div class="card-header bg-primary text-white">
+		<h6 class="mb-0">Inquiry Records</h6>
+	</div>
+	<div class="">
+		<div class="table-responsive">
+			<table class="table table-hover table-striped table-sm mb-0" id="inquiryTable">
+				<thead class="table-light">
+					<tr>
+						<th>#</th>
+						<th>Full Name</th>
+						<th>Status</th>
+						<th>Date Created</th>
+						<th>Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					<?php
+					$i = 1;
+					$qry = $conn->query("SELECT * FROM `inquiry_list` ORDER BY `status` ASC, abs(unix_timestamp(`created_at`)) DESC");
+					while ($row = $qry->fetch_assoc()):
+					?>
 						<tr>
-							<th>#</th>
-							<th>Date Created</th>
-							<th>Name</th>
-							<th>Status</th>
-							<th>Action</th>
+							<td class="text-center align-middle"><?= $i++ ?></td>
+							<td class="align-middle"><?= htmlspecialchars($row['fullname']) ?></td>
+							<td class="align-middle text-center">
+								<span class="badge rounded-pill bg-<?= $row['status'] == 1 ? 'success' : 'secondary' ?>">
+									<?= $row['status'] == 1 ? 'Read' : 'Unread' ?>
+								</span>
+							</td>
+							<td class=""><?= date("Y-m-d g:i A", strtotime($row['created_at'])) ?></td>
+							<td class="text-center align-middle">
+								<div class="dropdown">
+									<button class="btn btn-sm btn-light border dropdown-toggle" data-bs-toggle="dropdown">
+										Actions
+									</button>
+									<ul class="dropdown-menu">
+										<li>
+											<a class="dropdown-item" href="./?page=inquiries/view_inquiry&id=<?= $row['id'] ?>">
+												<i class="bi bi-card-text text-primary me-2"></i> View
+											</a>
+										</li>
+										<li>
+											<hr class="dropdown-divider">
+										</li>
+										<li>
+											<a class="dropdown-item text-danger delete_data" href="javascript:void(0)" data-id="<?= $row['id'] ?>">
+												<i class="bi bi-trash me-2"></i> Delete
+											</a>
+										</li>
+									</ul>
+								</div>
+							</td>
 						</tr>
-					</thead>
-					<tbody>
-						<?php
-						$i = 1;
-						$qry = $conn->query("SELECT * from `inquiry_list` order by `status` asc, abs(unix_timestamp(`created_at`))  desc");
-						while ($row = $qry->fetch_assoc()):
-						?>
-							<tr>
-								<td class="align-items-center text-center"><?php echo $i++; ?></td>
-								<td class="align-items-center"><?php echo date("Y-m-d g:i A", strtotime($row['created_at'])) ?></td>
-								<td class="align-items-center"><?= $row['fullname'] ?></td>
-								<td class="align-items-center text-center">
-									<?php if ($row['status'] == 1): ?>
-										<span class="badge bg-success px-3 rounded-pill">Read</span>
-									<?php else: ?>
-										<span class="badge bg-secondary px-3 rounded-pill">Unread</span>
-									<?php endif; ?>
-								</td>
-								<td class="align-items-center" align="center">
-									<div class="dropdown">
-										<button type="button" class="btn btn-flat p-1 btn-default btn-sm border dropdown-toggle dropdown-icon" data-bs-toggle="dropdown">
-											Action
-										</button>
-										<div class="dropdown-menu" role="menu">
-											<a class="dropdown-item" href="./?page=inquiries/view_inquiry&id=<?php echo $row['id'] ?>"><span class="bi bi-card-text text-dark"></span> View</a>
-											<div class="dropdown-divider"></div>
-											<a class="dropdown-item delete_data" href="javascript:void(0)" data-id="<?php echo $row['id'] ?>"><span class="bi bi-trash text-danger"></span> Delete</a>
-										</div>
-									</div>
-								</td>
-							</tr>
-						<?php endwhile; ?>
-					</tbody>
-				</table>
-			</div>
+					<?php endwhile; ?>
+				</tbody>
+			</table>
 		</div>
 	</div>
 </div>
+
 <script>
-	$(document).ready(function() {
-		$('.delete_data').click(function() {
-			_conf("Are you sure to delete this inquiry permanently?", "delete_inquiry", [$(this).attr('data-id')])
-		})
-		const dT = new simpleDatatables.DataTable('#list')
+	document.addEventListener("DOMContentLoaded", function() {
+		// Initialize table
+		const table = new simpleDatatables.DataTable("#inquiryTable");
 
-	})
+		// Delete action
+		document.querySelectorAll(".delete_data").forEach(button => {
+			button.addEventListener("click", function() {
+				const id = this.dataset.id;
+				_conf("Are you sure you want to delete this inquiry permanently?", "delete_inquiry", [id]);
+			});
+		});
+	});
 
-	function delete_inquiry($id) {
+	function delete_inquiry(id) {
 		start_loader();
 		$.ajax({
 			url: _base_url_ + "classes/Master.php?f=delete_inquiry",
 			method: "POST",
 			data: {
-				id: $id
+				id
 			},
 			dataType: "json",
-			error: err => {
-				console.log(err)
-				alert_toast("An error occured.", 'error');
+			error: function(err) {
+				console.error(err);
+				alert_toast("An error occurred.", "error");
 				end_loader();
 			},
 			success: function(resp) {
-				if (typeof resp == 'object' && resp.status == 'success') {
+				if (resp?.status === "success") {
 					location.reload();
 				} else {
-					alert_toast("An error occured.", 'error');
+					alert_toast("An error occurred.", "error");
 					end_loader();
 				}
 			}
-		})
+		});
 	}
 </script>

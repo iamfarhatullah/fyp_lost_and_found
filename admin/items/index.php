@@ -1,76 +1,83 @@
 <?php if ($_settings->chk_flashdata('success')): ?>
 	<script>
-		alert_toast("<?php echo $_settings->flashdata('success') ?>", 'success')
+		alert_toast("<?= $_settings->flashdata('success') ?>", 'success');
 	</script>
 <?php endif; ?>
+
 <style>
 	#list td:nth-child(5),
 	#list td:nth-child(6) {
 		text-align: center !important;
 	}
 </style>
-<div class="card card-outline rounded-0 card-navy">
-	<div class="card-header ">
-		<div class="card-tools d-flex justify-content-end">
-			<a href="<?= base_url ?>admin?page=items/manage_item" id="create_new" class="btn btn-flat btn-primary bg-gradient-teal border-0 rounded00"><span class="fas fa-plus"></span> Create New</a>
-		</div>
+
+<div class="card card-outline rounded-0 border-primary">
+	<div class="card-header bg-primary d-flex justify-content-end align-items-center">
+		<a href="<?= base_url ?>admin?page=items/manage_item" id="create_new" class="btn btn-md btn-primary	rounded shadow-sm">
+			<i class="fas fa-plus"></i> Add Item
+		</a>
 	</div>
-	<div class="card-body">
+	<div class="">
 		<div class="container-fluid">
 			<div class="table-responsive">
-				<table class="table table-sm table-hover table-striped table-bordered" id="list">
+				<table class="table table-striped table-hover table-sm" id="list">
 					<colgroup>
 						<col width="5%">
-						<col width="20%">
 						<col width="15%">
 						<col width="35%">
-						<col width="15">
+						<col width="15%">
+						<col width="20%">
 						<col width="10%">
 					</colgroup>
 					<thead>
 						<tr>
 							<th>#</th>
-							<th>Date Created</th>
-							<th>Image</th>
+							<th>Posted By</th>
 							<th>Title</th>
 							<th>Status</th>
+							<th>Date Created</th>
 							<th>Action</th>
 						</tr>
 					</thead>
 					<tbody>
 						<?php
 						$i = 1;
-						$qry = $conn->query("SELECT *, COALESCE((SELECT name FROM `category_list` where `category_list`.`id` = `item_list`.`category_id`  ), 'N/A') as category from `item_list` order by abs(unix_timestamp(`created_at`)) desc ");
+						$qry = $conn->query("SELECT *, COALESCE((SELECT name FROM category_list WHERE category_list.id = item_list.category_id), 'N/A') as category FROM item_list ORDER BY abs(unix_timestamp(created_at)) DESC");
 						while ($row = $qry->fetch_assoc()):
 						?>
 							<tr>
-								<td class="align-items-center text-center"><?php echo $i++; ?></td>
-								<td class="align-items-center"><?php echo date("Y-m-d g:i A", strtotime($row['created_at'])) ?></td>
-								<td class="align-items-center"><?= $row['fullname'] ?></td>
-								<td class="align-items-center">
-									<p class="text-center truncate-1" style="max-width:250px"><?= $row['title'] ?></p>
+								<td class="text-center"><?= $i++ ?></td>
+
+								<td><?= htmlspecialchars($row['fullname']) ?></td>
+								<td>
+									<div class="text-truncate" style="max-width:250px">
+										<?= htmlspecialchars($row['title']) ?>
+									</div>
 								</td>
-								<td class="align-items-center justify-content-center text-center">
-									<?php if ($row['status'] == 1): ?>
-										<span class="badge bg-primary px-3 rounded-pill">Published</span>
-									<?php elseif ($row['status'] == 2): ?>
-										<span class="badge bg-success px-3 rounded-pill">Claimed</span>
-									<?php else: ?>
-										<span class="badge bg-secondary px-3 rounded-pill">Pending</span>
-									<?php endif; ?>
+								<td>
+									<?php
+									$status_badge = [
+										0 => '<span class="badge bg-secondary px-3 rounded-pill">Pending</span>',
+										1 => '<span class="badge bg-primary px-3 rounded-pill">Published</span>',
+										2 => '<span class="badge bg-success px-3 rounded-pill">Claimed</span>'
+									];
+									echo $status_badge[$row['status']] ?? '<span class="badge bg-light text-dark px-3">Unknown</span>';
+									?>
 								</td>
-								<td class="align-items-center" align="center">
+								<td><?= date("Y-m-d g:i A", strtotime($row['created_at'])) ?></td>
+								<td class="text-center">
 									<div class="dropdown">
-										<button type="button" class="btn btn-flat p-1 btn-default btn-sm border dropdown-toggle dropdown-icon" data-bs-toggle="dropdown">
+										<button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
 											Action
 										</button>
-										<div class="dropdown-menu" role="menu">
-											<a class="dropdown-item" href="./?page=items/view_item&id=<?php echo $row['id'] ?>"><span class="bi bi-card-text text-dark"></span> View</a>
-											<div class="dropdown-divider"></div>
-											<a class="dropdown-item" href="./?page=items/manage_item&id=<?php echo $row['id'] ?>"><span class="bi bi-pencil-square text-primary"></span> Edit</a>
-											<div class="dropdown-divider"></div>
-											<a class="dropdown-item delete_data" href="javascript:void(0)" data-id="<?php echo $row['id'] ?>"><span class="bi bi-trash text-danger"></span> Delete</a>
-										</div>
+										<ul class="dropdown-menu dropdown-menu-end">
+											<li><a class="dropdown-item" href="./?page=items/view_item&id=<?= $row['id'] ?>"><i class="bi bi-card-text text-dark me-1"></i> View</a></li>
+											<li><a class="dropdown-item" href="./?page=items/manage_item&id=<?= $row['id'] ?>"><i class="bi bi-pencil-square text-primary me-1"></i> Edit</a></li>
+											<li>
+												<hr class="dropdown-divider">
+											</li>
+											<li><a class="dropdown-item text-danger delete_data" href="javascript:void(0)" data-id="<?= $row['id'] ?>"><i class="bi bi-trash me-1"></i> Delete</a></li>
+										</ul>
 									</div>
 								</td>
 							</tr>
@@ -81,36 +88,39 @@
 		</div>
 	</div>
 </div>
-<script>
-	$(document).ready(function() {
-		$('.delete_data').click(function() {
-			_conf("Are you sure to delete this item permanently?", "delete_item", [$(this).attr('data-id')])
-		})
-		const dT = new simpleDatatables.DataTable('#list')
-	})
 
-	function delete_item($id) {
+<script>
+	$(function() {
+		const table = new simpleDatatables.DataTable("#list");
+
+		$('.delete_data').on('click', function() {
+			const id = $(this).data('id');
+			_conf("Are you sure you want to delete this item permanently?", "delete_item", [id]);
+		});
+	});
+
+	function delete_item(id) {
 		start_loader();
 		$.ajax({
 			url: _base_url_ + "classes/Master.php?f=delete_item",
 			method: "POST",
 			data: {
-				id: $id
+				id
 			},
 			dataType: "json",
 			error: err => {
-				console.log(err)
-				alert_toast("An error occured.", 'error');
+				console.error(err);
+				alert_toast("An error occurred.", "error");
 				end_loader();
 			},
 			success: function(resp) {
-				if (typeof resp == 'object' && resp.status == 'success') {
+				if (resp?.status === 'success') {
 					location.reload();
 				} else {
-					alert_toast("An error occured.", 'error');
+					alert_toast("Deletion failed.", "error");
 					end_loader();
 				}
 			}
-		})
+		});
 	}
 </script>

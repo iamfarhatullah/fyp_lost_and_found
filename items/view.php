@@ -1,54 +1,43 @@
 <?php
 if (isset($_GET['id']) && $_GET['id'] > 0) {
-	$qry = $conn->query("SELECT *, COALESCE((SELECT `name` FROM `category_list` where `category_list`.`id` = `item_list`. `category_id` ) ,'N/A') as `category` from `item_list` where id = '{$_GET['id']}' ");
+	$qry = $conn->query("SELECT *, COALESCE((SELECT `name` FROM `category_list` WHERE `category_list`.`id` = `item_list`.`category_id`), 'N/A') AS `category` FROM `item_list` WHERE id = '{$_GET['id']}' ");
 	if ($qry->num_rows > 0) {
 		foreach ($qry->fetch_assoc() as $k => $v) {
 			$$k = $v;
 		}
 	} else {
-		echo '<script>alert("item ID is not valid."); location.replace("./?page=items")</script>';
+		echo '<script>alert("Item ID is not valid."); location.replace("./?page=items")</script>';
 	}
 } else {
-	echo '<script>alert("item ID is Required."); location.replace("./?page=items")</script>';
+	echo '<script>alert("Item ID is Required."); location.replace("./?page=items")</script>';
 }
 ?>
-<style>
-	.lf-image {
-		width: 400px;
-		height: 300px;
-		margin: 1em auto;
-		background: #000;
-		box-shadow: 1px 1px 10px #00000069;
-	}
 
-	.lf-image>img {
-		width: 100%;
-		height: 100%;
-		object-fit: scale-down;
-		object-position: center center;
-	}
-</style>
-<div class="row mt-lg-n4 mt-md-n4 justify-content-center">
-	<div class="col-lg-10 col-md-12 col-sm-12 col-xs-12">
-		<div class="card rounded-0">
-			<div class="card-body">
-				<div class="container-fluid mt-4">
-					<div class="lf-image">
-						<img src="<?= validate_image($image_path ?? "") ?>" alt="<?= $title ?? "" ?>">
+<div class="container-fluid">
+	<div class="row justify-content-center">
+		<div class="col-lg-12 col-md-12">
+			<div class="card shadow-sm border-0">
+				<div class="card-body p-4">
+					<div class="bg-info">
+						<h3 class="p-3 bg-default"><?= $title ?? "" ?>
+							<span class="badge bg-secondary ms-2"><?= $category ?? "" ?></span>
+						</h3>
 					</div>
-					<h2 class="titleTxt"><?= $title ?? "" ?> <span>| <?= $category ?? "" ?></span></h2>
-					<dl>
-						<dt class="text-muted">Founder Name</dt>
-						<dd class="ps-4"><?= $fullname ?? "" ?></dd>
-						<dt class="text-muted">Contact No.</dt>
-						<dd class="ps-4"><?= $contact ?? "" ?></dd>
-						<dt class="text-muted">Description</dt>
-						<dd class="ps-4"><?= isset($description) ? str_replace("\n", "<br>", ($description)) : "" ?></dd>
+					<div class="mb-4">
+						<img src="<?= validate_image($image_path ?? "") ?>" alt="<?= $title ?? "" ?>" class="img-fluid rounded" style="max-height: 300px; object-fit: contain;">
+					</div>
+					<dl class="row">
+						<dt class="col-sm-3 text-muted">Founder Name</dt>
+						<dd class="col-sm-9"><?= $fullname ?? "" ?></dd>
+
+						<dt class="col-sm-3 text-muted">Contact No.</dt>
+						<dd class="col-sm-9"><?= $contact ?? "" ?></dd>
+
+						<dt class="col-sm-3 text-muted">Description</dt>
+						<dd class="col-sm-9"><?= isset($description) ? nl2br($description) : "" ?></dd>
 					</dl>
 				</div>
 			</div>
 		</div>
 	</div>
 </div>
-<script>
-</script>

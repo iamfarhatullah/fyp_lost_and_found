@@ -1,131 +1,121 @@
-<h1 class="pageTitle text-center">Post Found Item</h1>
-<hr class="mx-auto bg-primary border-primary opacity-100" style="width:50px">
 <div class="row justify-content-center">
-    <div class="col-lg-8 col-md-8 col-sm-12 col-12">
-        <div class="card">
+    <div class="col-lg-12">
+        <div class="card shadow-sm">
             <div class="card-body py-4">
-                <h4 class="pageTitle">Please fill all the required fields</h4>
-                <form action="" id="item-form">
-                    <input type="hidden" name="id" value="<?php echo isset($id) ? $id : '' ?>">
+                <div class="p-1" style="background-color: #046fa3;">
+                    <h2 class="text-white mt-2">Post Item</h2>
+                </div>
+                <p class="mb-4 text-default mt-3">Please fill all the required field. Once submitted the admin will approve/disapprove your request</p>
+                <form action="" id="item-form" enctype="multipart/form-data">
+                    <input type="hidden" name="id" value="<?= isset($id) ? $id : '' ?>">
                     <input type="hidden" name="founder">
-                    <div class="row">
-                        <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                            <label for="category_id" class="form-label">Category</label>
-                            <select name="category_id" id="category_id" class="form-select" required="required">
-                                <option value="" disabled <?= !isset($category_id) ? "selected" : "" ?>></option>
-                                <?php
-                                $query = $conn->query("SELECT * FROM `category_list` where `status` = 1 order by `name` asc");
-                                while ($row = $query->fetch_assoc()):
-                                ?>
-                                    <option value="<?= $row['id'] ?>" <?= isset($category_id) && $category_id == $row['id'] ? "selected" : "" ?>><?= $row['name'] ?></option>
-                                <?php endwhile; ?>
-                            </select>
+
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="mt-3">
+                                <label for="category_id" class="form-label">Category</label>
+                                <select name="category_id" id="category_id" class="form-select" required>
+                                    <option value="" disabled <?= !isset($category_id) ? "selected" : "" ?>></option>
+                                    <?php
+                                    $query = $conn->query("SELECT * FROM `category_list` WHERE `status` = 1 ORDER BY `name` ASC");
+                                    while ($row = $query->fetch_assoc()):
+                                    ?>
+                                        <option value="<?= $row['id'] ?>" <?= isset($category_id) && $category_id == $row['id'] ? "selected" : "" ?>>
+                                            <?= $row['name'] ?>
+                                        </option>
+                                    <?php endwhile; ?>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="fullname" class="form-label">Founder Name</label>
+                                <input type="text" name="fullname" id="fullname" class="form-control" value="<?= isset($fullname) ? $fullname : '' ?>" required autofocus>
+                            </div>
+                            <div>
+                                <label for="title" class="form-label">Title</label>
+                                <input type="text" name="title" id="title" class="form-control" value="<?= isset($title) ? $title : '' ?>" required>
+                            </div>
+                            <div>
+                                <label for="contact" class="form-label">Contact #</label>
+                                <input type="text" name="contact" id="contact" class="form-control" value="<?= isset($contact) ? $contact : '' ?>" required>
+                            </div>
+                            <div>
+                                <label for="description" class="form-label">Description</label>
+                                <textarea name="description" id="description" rows="8" class="form-control" required><?= isset($description) ? $description : '' ?></textarea>
+                            </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                            <label for="fullname" class="control-label">Founder Name</label>
-                            <input type="text" name="fullname" id="fullname" class="form-control form-control-sm rounded-0" value="<?php echo isset($fullname) ? $fullname : ''; ?>" autofocus required />
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                            <label for="title" class="control-label">Title</label>
-                            <input type="text" name="title" id="title" class="form-control form-control-sm rounded-0" value="<?php echo isset($title) ? $title : ''; ?>" required />
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                            <label for="contact" class="control-label">Contact #</label>
-                            <input type="text" name="contact" id="contact" class="form-control form-control-sm rounded-0" value="<?php echo isset($contact) ? $contact : ''; ?>" required />
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                            <label for="description" class="control-label">Description</label>
-                            <textarea rows="5" name="description" id="description" class="form-control form-control-sm rounded-0" required><?php echo isset($description) ? $description : ''; ?></textarea>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="form-group">
-                            <label for="" class="control-label">Item Image</label>
-                            <div class="custom-file">
+                        <div class="col-md-6">
+                            <div class="mt-3">
+                                <label for="customFile" class="form-label">Item Image</label>
                                 <input type="file" class="form-control" id="customFile" name="image" onchange="displayImg(this,$(this))" accept="image/png, image/jpeg">
+                            </div>
+                            <div class="text-center mt-3">
+                                <img src="<?= validate_image(isset($image_path) ? $image_path : '') ?>" alt="Item Image" id="cimg" class="img-fluid img-thumbnail" style="max-height: 250px;">
                             </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="form-group d-flex justify-content-center">
-                            <img src="<?php echo validate_image(isset($image_path) ? $image_path : '') ?>" alt="" id="cimg" class="img-fluid img-thumbnail">
-                        </div>
+                    <br><br>
+                    <div class="d-grid col-md-4 mt-4" style="float: right;">
+                        <button type="submit" class="btn btn-success"><i class="bi bi-send"></i> Submit</button>
                     </div>
+                    <br>
                 </form>
-            </div>
-            <div class="card-footer">
-                <div class="col-lg-4 col-md-6 col-sm-10 col-12 mx-auto">
-                    <button class="btn btn-primary btn-sm w-100" form="item-form"><i class="bi bi-send"></i> Submit</button>
-                </div>
             </div>
         </div>
     </div>
 </div>
+
 <script>
     function displayImg(input, _this) {
         if (input.files && input.files[0]) {
-            var reader = new FileReader();
+            const reader = new FileReader();
             reader.onload = function(e) {
                 $('#cimg').attr('src', e.target.result);
             }
-
             reader.readAsDataURL(input.files[0]);
         } else {
-            $('#cimg').attr('src', "<?php echo validate_image(isset($meta['image_path']) ? $meta['image_path'] : '') ?>");
+            $('#cimg').attr('src', "<?= validate_image(isset($image_path) ? $image_path : '') ?>");
         }
     }
+
     $(document).ready(function() {
         $('#category_id').select2({
             placeholder: 'Please Select Here',
             width: '100%'
-        })
+        });
+
         $('#item-form').submit(function(e) {
             e.preventDefault();
-            var _this = $(this)
+            const _this = $(this);
             $('.err-msg').remove();
-            setTimeout(() => {
-                start_loader();
-                $.ajax({
-                    url: _base_url_ + "classes/Master.php?f=save_item",
-                    data: new FormData($(this)[0]),
-                    cache: false,
-                    contentType: false,
-                    processData: false,
-                    method: 'POST',
-                    type: 'POST',
-                    dataType: 'json',
-                    error: err => {
-                        console.log(err)
-                        alert_toast("An error occured", 'error');
-                        end_loader();
-                    },
-                    success: function(resp) {
-                        if (typeof resp == 'object' && resp.status == 'success') {
-                            location.replace('./?page=found')
-                        } else if (resp.status == 'failed' && !!resp.msg) {
-                            var el = $('<div>')
-                            el.addClass("alert alert-danger err-msg").text(resp.msg)
-                            _this.prepend(el)
-                            el.show('slow')
-                            $("html, body").scrollTop(0);
-                            end_loader()
-                        } else {
-                            alert_toast("An error occured", 'error');
-                            end_loader();
-                            console.log(resp)
-                        }
-                    }
-                })
-            }, 200);
 
-        })
-    })
+            start_loader();
+            $.ajax({
+                url: _base_url_ + "classes/Master.php?f=save_item",
+                data: new FormData(this),
+                cache: false,
+                contentType: false,
+                processData: false,
+                method: 'POST',
+                dataType: 'json',
+                error: err => {
+                    console.error(err);
+                    alert_toast("An error occurred", 'error');
+                    end_loader();
+                },
+                success: function(resp) {
+                    if (resp?.status === 'success') {
+                        location.replace('./?page=found');
+                    } else if (resp.status === 'failed' && resp.msg) {
+                        const el = $('<div>').addClass("alert alert-danger err-msg").text(resp.msg);
+                        _this.prepend(el);
+                        $("html, body").scrollTop(0);
+                        end_loader();
+                    } else {
+                        alert_toast("An error occurred", 'error');
+                        end_loader();
+                    }
+                }
+            });
+        });
+    });
 </script>

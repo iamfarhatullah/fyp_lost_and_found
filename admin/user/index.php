@@ -1,5 +1,5 @@
 <?php
-$user = $conn->query("SELECT * FROM users where id ='" . $_settings->userdata('id') . "'");
+$user = $conn->query("SELECT * FROM users WHERE id = '" . $_settings->userdata('id') . "'");
 foreach ($user->fetch_array() as $k => $v) {
 	$meta[$k] = $v;
 }
@@ -9,58 +9,67 @@ foreach ($user->fetch_array() as $k => $v) {
 		height: 15vh;
 		width: 15vh;
 		object-fit: cover;
-		border-radius: 100% 100%;
+		border-radius: 50%;
 	}
 </style>
+
 <section class="section">
-	<div class="card card-outline rounded-0 card-navy">
+	<div class="card card-outline card-navy rounded-0">
+		<div class="card-header py-2">
+			<h5 class="card-title mb-0">Update Your Profile</h5>
+		</div>
 		<div class="card-body">
 			<div class="container-fluid">
 				<div id="msg"></div>
-				<form action="" id="manage-user">
-					<input type="hidden" name="id" value="<?php echo $_settings->userdata('id') ?>">
-					<div class="form-group">
-						<label for="name">First Name</label>
-						<input type="text" name="firstname" id="firstname" class="form-control" value="<?php echo isset($meta['firstname']) ? $meta['firstname'] : '' ?>" required>
-					</div>
-					<div class="form-group">
-						<label for="name">Middle Name</label>
-						<input type="text" name="middlename" id="middlename" class="form-control" value="<?php echo isset($meta['middlename']) ? $meta['middlename'] : '' ?>">
-					</div>
-					<div class="form-group">
-						<label for="name">Last Name</label>
-						<input type="text" name="lastname" id="lastname" class="form-control" value="<?php echo isset($meta['lastname']) ? $meta['lastname'] : '' ?>" required>
-					</div>
-					<div class="form-group">
-						<label for="username">Username</label>
-						<input type="text" name="username" id="username" class="form-control" value="<?php echo isset($meta['username']) ? $meta['username'] : '' ?>" required autocomplete="off">
-					</div>
-					<div class="form-group">
-						<label for="password">Password</label>
-						<input type="password" name="password" id="password" class="form-control" value="" autocomplete="off">
-						<small><i>Leave this blank if you dont want to change the password.</i></small>
-					</div>
-					<div class="form-group">
-						<label for="" class="control-label">Avatar</label>
-						<div class="custom-file">
-							<input type="file" class="form-control" id="customFile" name="img" onchange="displayImg(this,$(this))" accept="image/png, image/jpeg">
+				<form id="manage-user" enctype="multipart/form-data">
+					<input type="hidden" name="id" value="<?= $_settings->userdata('id') ?>">
+
+					<div class="row">
+						<div class="col-md-6 mb-3">
+							<label for="firstname" class="form-label">First Name</label>
+							<input type="text" name="firstname" id="firstname" class="form-control" value="<?= $meta['firstname'] ?? '' ?>" required>
+						</div>
+						<div class="col-md-6 mb-3">
+							<label for="middlename" class="form-label">Middle Name</label>
+							<input type="text" name="middlename" id="middlename" class="form-control" value="<?= $meta['middlename'] ?? '' ?>">
 						</div>
 					</div>
-					<div class="form-group d-flex justify-content-center">
-						<img src="<?php echo validate_image(isset($meta['avatar']) ? $meta['avatar'] : '') ?>" alt="" id="cimg" class="img-fluid img-thumbnail">
+
+					<div class="row">
+						<div class="col-md-6 mb-3">
+							<label for="lastname" class="form-label">Last Name</label>
+							<input type="text" name="lastname" id="lastname" class="form-control" value="<?= $meta['lastname'] ?? '' ?>" required>
+						</div>
+						<div class="col-md-6 mb-3">
+							<label for="username" class="form-label">Username</label>
+							<input type="text" name="username" id="username" class="form-control" value="<?= $meta['username'] ?? '' ?>" required autocomplete="off">
+						</div>
+					</div>
+
+					<div class="mb-3">
+						<label for="password" class="form-label">Password</label>
+						<input type="password" name="password" id="password" class="form-control" autocomplete="off">
+						<small class="text-muted fst-italic">Leave this blank if you do not want to change the password.</small>
+					</div>
+
+					<div class="mb-3">
+						<label for="customFile" class="form-label">Avatar</label>
+						<input type="file" class="form-control" id="customFile" name="img" accept="image/png, image/jpeg" onchange="displayImg(this)">
+					</div>
+
+					<div class="mb-3 text-center">
+						<img id="cimg" src="<?= validate_image($meta['avatar'] ?? '') ?>" alt="Profile Avatar" class="img-thumbnail">
+					</div>
+
+					<div class="text-center">
+						<button type="submit" class="btn btn-primary bg-gradient-teal px-4">Update</button>
 					</div>
 				</form>
 			</div>
 		</div>
-		<div class="card-footer">
-			<div class="col-md-12">
-				<div class="row">
-					<button class="btn btn-sm btn-primary bg-gradient-teal border-0" form="manage-user">Update</button>
-				</div>
-			</div>
-		</div>
 	</div>
 </section>
+
 <script>
 	function displayImg(input, _this) {
 		if (input.files && input.files[0]) {
